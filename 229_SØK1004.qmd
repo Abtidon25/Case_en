@@ -1,0 +1,121 @@
+---
+title: "CASE ONE"
+format: PDF
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+library(PxWebApiData)
+library(tidyverse)
+```
+
+You can add options to executable code like this
+
+```{r}
+variabler <- ApiData("http://data.ssb.no/api/v0/no/table/09842", returnMetaFrames = TRUE)
+names(variabler)
+CCverdier <- ApiData("https://data.ssb.no/api/v0/no/table/09842/", returnMetaData = TRUE)
+verdier
+tabell <- ApiData("https://data.ssb.no/api/v0/no/table/09842/",
+                  Tid = paste(1970:2019),
+                  ContentsCode = "BNP")
+head(tabell[[1]])
+head(tabell[[2]])
+bnp <- tabell[[1]]
+str(bnp)
+bnp <- bnp %>%
+  mutate(år=parse_number(år)) %>% 
+  rename(bnp=value)
+str(bnp)
+
+library(dplyr)
+f=filter(bnp, år >='1990')
+
+bnp %>%
+  ggplot(aes(x=år, y=bnp)) +
+  geom_line(color="dark blue") +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title="GDP \n (GDP per Capita)",
+       x ="Year",
+       y = "GDP per Capita") +
+  theme_bw()
+
+##Endering i GDP
+
+bnp %>% 
+  mutate(BNP_L1=lag(BNP)) %>% 
+  head()
+bnp %>% 
+  mutate(BNP_L1=lag(BNP),
+         dBNP=BNP-BNP_L1) %>% 
+  head()
+bnp %>% 
+  mutate(dBNP=BNP-lag(BNP)) %>% 
+  head()
+bnp %>%
+  mutate(prosBNP = 100*(BNP - lag(BNP))/lag(BNP)) %>%
+  head()
+
+bnp %>%
+  mutate(prosBNP = 100*(BNP - lag(BNP))/lag(BNP)) %>%
+  ggplot(aes(x=år, y=prosBNP)) +
+  geom_line()
+
+bnp %>%
+  mutate(prosBNP = 100*(BNP - lag(BNP))/lag(BNP)) %>%
+  filter(år >=1971) %>% 
+  ggplot(aes(x=år, y=prosBNP)) +
+  geom_line(color="dark red") +
+  labs(title="Prosentvis endring i bruttonasjonalprodukt - BNP",
+       x =" ",
+       y = "prosent") +
+  theme_bw()
+
+##oppgave 5
+
+##endering in GDP
+bnp %>% 
+  mutate(BNP_LG1=log(BNP)) %>% 
+  head()
+bnp %>% 
+  mutate(BNP_LG1=log(BNP),
+         dBNP=BNP-BNP_LG1) %>% 
+  head()
+bnp %>% 
+  mutate(dLGBNP=BNP-log(BNP)) %>% 
+  head()
+
+bnp %>%
+  mutate(prosLGBNP = 100*(BNP - log(BNP))/log(BNP)) %>%
+  head()
+
+bnp %>%
+  mutate(prosLGBNP = 100*(BNP - log(BNP))/log(BNP)) %>%
+  ggplot(aes(x=år, y=prosLGBNP)) +
+  geom_line(color="dark red") +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title="Percentage of log differential change in gross domestic product",
+       x ="Year",
+       y = "%age of log diff GDP") +
+  theme_bw()
+
+##oppgave 6
+
+prosLGBNP = 100*(bnp$BNP - log(bnp$BNP))/log(bnp$BNP)
+sort(prosLGBNP)
+
+
+
+
+
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
